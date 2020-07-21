@@ -13,36 +13,35 @@
 </head>
  
 <body>
+<video autoplay="true" id="videoElement"></video>
 	
-<video autoplay></video>
-<img src="">
-<canvas style="display:none;"></canvas>
+<button id="capture">Capture</button>
+	
+<img id="img" src="">
+<canvas id="snapshot"></canvas>
 	
 <script>
-const captureVideoButton =
-  document.querySelector('#screenshot .capture-button');
-const screenshotButton = document.querySelector('#screenshot-button');
-const img = document.querySelector('#screenshot img');
-const video = document.querySelector('#screenshot video');
-
-const canvas = document.createElement('canvas');
-
-captureVideoButton.onclick = function() {
-  navigator.mediaDevices.getUserMedia(constraints).
-    then(handleSuccess).catch(handleError);
-};
-
-screenshotButton.onclick = video.onclick = function() {
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
+var video = document.getElementById('videoElement');
+var snapshotCanvas = document.getElementById('snapshot');
+var captureButton = document.getElementById('capture');
+var img = document.getElementById('img');
+	
+captureButton.onclick = video.onclick = function() {
+	snapshotCanvas.width = video.videoWidth;
+  snapshotCanvas.height = video.videoHeight;
+  snapshotCanvas.getContext('2d').drawImage(video, 0, 0);
   // Other browsers will fall back to image/png
-  img.src = canvas.toDataURL('image/webp');
-};
+  img.src = snapshotCanvas.toDataURL('image/webp');
+});
 
-function handleSuccess(stream) {
-  screenshotButton.disabled = false;
-  video.srcObject = stream;
+if (navigator.mediaDevices.getUserMedia) {
+	navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+      video.srcObject = stream;
+    })
+    .catch(function (err0r) {
+      console.log("Something went wrong!");
+    });
 }
 </script>
 	
