@@ -25,8 +25,19 @@
 
 	</video>
 </div>
+<button id="capture">Capture</button>
+<canvas id="snapshot" width=320 height=240></canvas>
 <script>
-var video = document.querySelector("#videoElement");
+var video = document.getElementById('videoElement');
+var snapshotCanvas = document.getElementById('snapshot');
+var captureButton = document.getElementById('capture');
+	
+captureButton.addEventListener('click', function() {
+    var context = snapshot.getContext('2d');
+    // Draw the video frame to the canvas.
+    context.drawImage(player, 0, 0, snapshotCanvas.width, 
+        snapshotCanvas.height);
+  });
 
 if (navigator.mediaDevices.getUserMedia) {
   navigator.mediaDevices.getUserMedia({ video: true })
