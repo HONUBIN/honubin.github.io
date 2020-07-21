@@ -5,53 +5,44 @@
 <title>Display Webcam Stream</title>
  
 <style>
-#container {
-	margin: 0px auto;
-	width: 500px;
-	height: 375px;
-	border: 10px #333 solid;
-}
 #videoElement {
 	width: 500px;
 	height: 375px;
-	background-color: #666;
 }
 </style>
 </head>
  
 <body>
-<div id="container">
-	<video autoplay="true" id="videoElement">
-
-	</video>
-</div>
 	
-<button id="capture">Capture</button>
-	
-<div id="container">
-<canvas id="snapshot" width=320 height=240></canvas>
-</div>
+<video autoplay id=videoElement></video>
+<img src="">
+<canvas style="display:none;"></canvas>
 	
 <script>
-var video = document.getElementById('videoElement');
-var snapshotCanvas = document.getElementById('snapshot');
-var captureButton = document.getElementById('capture');
+const captureVideoButton =
+  document.querySelector('#screenshot .capture-button');
+const screenshotButton = document.querySelector('#screenshot-button');
+const img = document.querySelector('#screenshot img');
+const video = document.querySelector('#screenshot video');
 
-if (navigator.mediaDevices.getUserMedia) {
-  captureButton.addEventListener('click', function() {
-    var context = snapshot.getContext('2d');
-    // Draw the video frame to the canvas.
-    context.drawImage(player, 0, 0, snapshotCanvas.width, 
-	snapshotCanvas.height);
-  });
-	
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video.srcObject = stream;
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
+const canvas = document.createElement('canvas');
+
+captureVideoButton.onclick = function() {
+  navigator.mediaDevices.getUserMedia(constraints).
+    then(handleSuccess).catch(handleError);
+};
+
+screenshotButton.onclick = video.onclick = function() {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  // Other browsers will fall back to image/png
+  img.src = canvas.toDataURL('image/webp');
+};
+
+function handleSuccess(stream) {
+  screenshotButton.disabled = false;
+  video.srcObject = stream;
 }
 </script>
 	
