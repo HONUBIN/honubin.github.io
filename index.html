@@ -22,11 +22,25 @@
 <video autoplay="true" id="videoElement"></video>
 <canvas id="canvas"></canvas>
 <button id="capture">Capture</button>
+<form id="myForm">
+	<div>
+		<label for="projectID">Enter projectID:</label>
+		<input type="text" name="projectID">
+	</div>
+	<div>
+		<label for="files">Upload files:</label>
+		<input type="files" id="files" name="files">
+	</div>
+<input type="submit" value="Submit!">
+</form>
 	
 <script>
 var video = document.querySelector("#videoElement");
 var canvas = document.querySelector("#canvas");
 var captureButton = document.querySelector("#capture");
+var myForm = document.querySelector("#myForm");
+formData = new FormData(myForm);
+document.write(formData)
 	
 captureButton.onclick = video.onclick = function() {
 	canvas.width = video.videoWidth;
