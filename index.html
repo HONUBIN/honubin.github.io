@@ -43,9 +43,9 @@ var captureButton = document.querySelector("#capture");
 var myForm = document.querySelector("#myForm");
 var predictButton = document.querySelector("#predict");
 	
-predictButton.onclick = function() {
+predictButton.onclick = async function() {
 	formData = new FormData(myForm);
-	document.write(formData.projectID);
+	console.log(formData.projectID);
 	await axios.post(`localhost:3020/storage_api/file_system/`
 		+ `face_detection/projects/${formData.projectID}}/predict-files`,
 	    	formData,
