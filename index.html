@@ -40,7 +40,8 @@ var canvas = document.querySelector("#canvas");
 var captureButton = document.querySelector("#capture");
 var myForm = document.querySelector("#myForm");
 formData = new FormData(myForm);
-document.write(formData)
+document.write(formData);
+alert(formData);
 	
 captureButton.onclick = video.onclick = function() {
 	canvas.width = video.videoWidth;
