@@ -22,7 +22,7 @@
 <video autoplay="true" id="videoElement"></video>
 <canvas id="canvas"></canvas>
 <button id="capture">Capture</button>
-<form id="myForm" action='form.php'>
+<form id="myForm" method="post" action='form.php'>
 	<div>
 		<label for="projectID">Enter projectID:</label>
 		<input type="text" name="projectID">
@@ -31,7 +31,7 @@
 		<label for="files">Upload files:</label>
 		<input type="file" id="files" name="files">
 	</div>
-<input type="submit" value="Submit!">
+<button id="predict">Predict</button>
 </form>
 	
 <script>
@@ -39,7 +39,15 @@ var video = document.querySelector("#videoElement");
 var canvas = document.querySelector("#canvas");
 var captureButton = document.querySelector("#capture");
 var myForm = document.querySelector("#myForm");
-formData = new FormData(myForm);
+var predictButton = document.querySelector("#predict");
+	
+predictButton.onclick = function() {
+	formData = new FormData(myForm);
+	await Axios.post(`/storage_api/file_system/`
+		+ `face_detection/projects/${formData.projectID}}/predict-files`,
+	    	formData,
+	  	{ headers: {'Content-Type': 'application/json'} },
+	);
 	
 captureButton.onclick = video.onclick = function() {
 	canvas.width = video.videoWidth;
