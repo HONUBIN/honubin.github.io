@@ -19,26 +19,22 @@
 </head>
  
 <body>
-<video autoplay="true" id="videoElement"></video>
+<div id="container">
+	<video autoplay="true" id="videoElement"></video>
+<div>
 	
 <button id="capture">Capture</button>
-	
-<img id="img" src="">
-<canvas id="snapshot"></canvas>
+
+<div id="container">
+  <img id="img" src="">
+  <canvas id="snapshot"></canvas>
+<div>
 	
 <script>
 var video = document.getElementById('videoElement');
 var snapshotCanvas = document.getElementById('snapshot');
 var captureButton = document.getElementById('capture');
 var img = document.getElementById('img');
-	
-captureButton.onclick = video.onclick = function() {
-	snapshotCanvas.width = video.videoWidth;
-  snapshotCanvas.height = video.videoHeight;
-  snapshotCanvas.getContext('2d').drawImage(video, 0, 0);
-  // Other browsers will fall back to image/png
-  img.src = snapshotCanvas.toDataURL('image/webp');
-});
 
 if (navigator.mediaDevices.getUserMedia) {
 	navigator.mediaDevices.getUserMedia({ video: true })
@@ -49,6 +45,14 @@ if (navigator.mediaDevices.getUserMedia) {
       console.log("Something went wrong!");
     });
 }
+	
+captureButton.onclick = video.onclick = function() {
+	snapshotCanvas.width = video.videoWidth;
+  snapshotCanvas.height = video.videoHeight;
+  snapshotCanvas.getContext('2d').drawImage(video, 0, 0);
+  // Other browsers will fall back to image/png
+  img.src = snapshotCanvas.toDataURL('image/webp');
+});
 </script>
 	
 </body>
