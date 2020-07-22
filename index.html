@@ -16,7 +16,7 @@
 	height: 375px;
 	background-color: #666;
 }
-#img {
+#canvas {
 	width: 500px;
 	height: 375px;
 	background-color: #666;
@@ -29,22 +29,19 @@
 	<video autoplay="true" id="videoElement"></video>
 </div>
 <button id="capture">Capture</button>
-<canvas id="canvas"></canvas>
 <div id="container">
-	<img id="img"></video>
+	<canvas id="canvas"></canvas>
 </div>
 	
 <script>
 var video = document.querySelector("#videoElement");
 var canvas = document.querySelector("#canvas");
 var captureButton = document.querySelector("#capture");
-var img = document.querySelector("#img");
 	
 captureButton.onclick = video.onclick = function() {
 	canvas.width = video.videoWidth;
 	canvas.height = video.videoHeight;
 	canvas.getContext('2d').drawImage(video, 0, 0);
-	img.src = canvas.toDataURL('image/webp');
 }
 
 if (navigator.mediaDevices.getUserMedia) {
