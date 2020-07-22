@@ -6,11 +6,7 @@
  
 <style>
 #container {
-	margin: 0px auto;
-	width: 500px;
-	height: 375px;
-}
-#videoElement {
+	margin: 10px;
 	width: 500px;
 	height: 375px;
 	background-color: #666;
@@ -27,24 +23,23 @@
 
 <div id="container">
   <img id="img" src="">
-  <canvas id="snapshot"></canvas>
 <div>
+	
+<canvas id="snapshot" style="display:none;"></canvas>
 	
 <script>
 var video = document.getElementById('videoElement');
 var snapshotCanvas = document.getElementById('snapshot');
 var captureButton = document.getElementById('capture');
 var img = document.getElementById('img');
-
-if (navigator.mediaDevices.getUserMedia) {
-	navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video.srcObject = stream;
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
-}
+	
+navigator.mediaDevices.getUserMedia({ video: true })
+	.then(function (stream) {
+	video.srcObject = stream;
+	})
+	.catch(function (error) {
+	console.log("Something went wrong!");
+});
 	
 captureButton.onclick = video.onclick = function() {
 	snapshotCanvas.width = video.videoWidth;
