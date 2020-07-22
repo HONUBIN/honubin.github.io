@@ -35,6 +35,8 @@
 </form>
 	
 <script>
+const axios = require('axios');
+	
 var video = document.querySelector("#videoElement");
 var canvas = document.querySelector("#canvas");
 var captureButton = document.querySelector("#capture");
@@ -43,7 +45,7 @@ var predictButton = document.querySelector("#predict");
 	
 predictButton.onclick = function() {
 	formData = new FormData(myForm);
-	await Axios.post(`/storage_api/file_system/`
+	await axios.post(`/storage_api/file_system/`
 		+ `face_detection/projects/${formData.projectID}}/predict-files`,
 	    	formData,
 	  	{ headers: {'Content-Type': 'application/json'} },
