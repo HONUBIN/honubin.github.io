@@ -6,7 +6,12 @@
  
 <style>
 #container {
-	margin: 10px;
+	margin: 0px auto;
+	width: 500px;
+	height: 375px;
+	border: 10px #333 solid;
+}
+#videoElement {
 	width: 500px;
 	height: 375px;
 	background-color: #666;
@@ -16,38 +21,22 @@
  
 <body>
 <div id="container">
-	<video autoplay="true" id="videoElement"></video>
-<div>
-	
-<button id="capture">Capture</button>
+	<video autoplay="true" id="videoElement">
 
-<div id="container">
-  <img id="img" src="">
-<div>
-	
-<canvas id="snapshot" style="display:none;"></canvas>
-	
+	</video>
+</div>
 <script>
-var video = document.getElementById('videoElement');
-var snapshotCanvas = document.getElementById('snapshot');
-var captureButton = document.getElementById('capture');
-var img = document.getElementById('img');
-	
-navigator.mediaDevices.getUserMedia({ video: true })
-	.then(function (stream) {
-	video.srcObject = stream;
-	})
-	.catch(function (error) {
-	console.log("Something went wrong!");
-});
-	
-captureButton.onclick = video.onclick = function() {
-	snapshotCanvas.width = video.videoWidth;
-  snapshotCanvas.height = video.videoHeight;
-  snapshotCanvas.getContext('2d').drawImage(video, 0, 0);
-  // Other browsers will fall back to image/png
-  img.src = snapshotCanvas.toDataURL('image/webp');
-});
+var video = document.querySelector("#videoElement");
+
+if (navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+      video.srcObject = stream;
+    })
+    .catch(function (err0r) {
+      console.log("Something went wrong!");
+    });
+}
 </script>
 	
 </body>
