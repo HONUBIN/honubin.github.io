@@ -5,12 +5,6 @@
 <title>Display Webcam Stream</title>
  
 <style>
-#container {
-	margin: 0px auto;
-	width: 500px;
-	height: 375px;
-	border: 10px #333 solid;
-}
 #videoElement {
 	width: 500px;
 	height: 375px;
@@ -25,13 +19,9 @@
 </head>
  
 <body>
-<div id="container">
-	<video autoplay="true" id="videoElement"></video>
-</div>
+<video autoplay="true" id="videoElement"></video>
+<canvas id="canvas"></canvas>
 <button id="capture">Capture</button>
-<div id="container">
-	<canvas id="canvas"></canvas>
-</div>
 	
 <script>
 var video = document.querySelector("#videoElement");
