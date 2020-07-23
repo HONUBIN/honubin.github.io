@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Display Webcam Stream</title>
+<title>Face Detection Project</title>
  
 <style>
 #videoElement {
@@ -21,48 +21,113 @@
 <body>
 <video autoplay="true" id="videoElement"></video>
 <canvas id="canvas"></canvas>
-<button id="capture">Capture</button>
-<form id="myForm" method="post">
+<button id="capture" onclick="capture();">Capture</button>
+<form id="tokenForm" method="post">
 	<div>
-		<label for="projectID">Enter projectID:</label>
-		<input type="text" name="projectID">
+		<label for="email">Enter your google email:</label>
+		<input type="text" name="email">
 	</div>
-	<div>
-		<label for="files">Upload files:</label>
-		<input type="file" id="files" name="files">
-	</div>
-<button id="predict">Predict</button>
 </form>
+<div>
+	<button id="getToken" onclick="getToken();">Get Token</button>
+</div>
+<div>
+	<textarea id="token">token</textarea>
+</div>
+<form id="projectForm" method="post">
+	<div>
+		<label for="projectName">Enter projectName:</label>
+		<input type="text" name="projectName">
+	</div>
+</form>
+<div>
+	<button id="createProject" onclick="createProject();">Create Project</button>
+</div>
+<div>
+	<textarea id="projectID">projectID</textarea>
+</div>
+<button id="capture" onclick="capture();">Capture</button>
 	
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 var video = document.querySelector("#videoElement");
 var canvas = document.querySelector("#canvas");
 var captureButton = document.querySelector("#capture");
-var myForm = document.querySelector("#myForm");
 var predictButton = document.querySelector("#predict");
-console.log(predictButton);
-	
-// predictButton.onclick = async function() {
-// 	formData = new FormData(myForm);
-// 	console.log(formData.projectID);
-// 	await axios.post(`localhost:3020/storage_api/file_system/`
-// 		+ `face_detection/projects/${formData.projectID}}/predict-files`,
-// 	    	formData,
-// 	  	{ headers: {'Content-Type': 'application/json'} },
-// 	);
-// }
-	
-predictButton.onclick = function() {
-	console.log('gaeru');
-	formData = new FormData(myForm);
-	console.log(formData.projectID);
+var tokenForm = document.querySelector("#tokenForm");
+var getTokenButton = document.querySelector("#getToken");
+var token = document.querySelector("#token");
+var projectForm = document.querySelector("#projectForm");
+var createProjectButton = document.querySelector("#createProject");
+var projectID = document.querySelector("#projectID");
+
+function createProject() {
+	var formData = new FormData(projectForm);
+	const projectName = formData.get("projectName");
+	const modelType = "FaceDetection";
+ 	axios.post("https://app.deepblock.net/storage_api/file_system/projects?boilerplate=true",
+		{ projectName, modelType },
+ 	  	{ headers: {"Authorization": token.value, "Content-Type": "application/json"} },
+ 	)
+	.then(function (response) {
+		axios.get("https://app.deepblock.net/storage_api/file_system/projects",
+			{ headers: {"Authorization": token.value} }
+		)
+		.then(function (response) {
+			var projectList = response.data.projectList;
+			for (project of projectList) {
+				if(project.projectName === projectName) {
+					projectID.value = project.projectID;
+					break;
+				}
+			}
+		})
+		.catch(function (error) {
+		});
+	})
+	.catch(function (error) {
+	});
 }
-	
-captureButton.onclick = video.onclick = function() {
+
+function getToken() {
+	var formData = new FormData(tokenForm);
+	axios.get("https://app.deepblock.net/api/token",
+		{ headers: {"Authorization": formData.get("email")} }
+	)
+	.then(function (response) {
+		token.value = response.data.token;
+	})
+	.catch(function (error) {
+	});
+}
+
+function capture() {
 	canvas.width = video.videoWidth;
 	canvas.height = video.videoHeight;
 	canvas.getContext('2d').drawImage(video, 0, 0);
+
+	var dataURL = canvas.toDataURL("image/jpg");
+	var blobBin = atob(dataURL.split(',')[1]);
+	var array = [];
+	for (var i = 0; i < blobBin.length; i++) {
+		array.push(blobBin.charCodeAt(i));
+	}
+	var file = new Blob([new Uint8Array(array)], {type: 'image/jpg'});
+	var formData = new FormData();
+  	formData.append('projectID', projectID.value);
+	formData.append('files', file);
+ 	axios.post("https://app.deepblock.net/storage_api/file_system/"
+		+ "face_detection/projects/"
+		+ projectID.value
+		+ "/predict-files",
+		formData,
+ 	  	{ headers: {"Authorization": token.value} },
+ 	)
+	.then(function (response) {
+		console.log(response);
+	})
+	.catch(function (error) {
+	});
 }
 
 if (navigator.mediaDevices.getUserMedia) {
