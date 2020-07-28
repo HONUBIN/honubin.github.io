@@ -31,7 +31,7 @@
 	<button id="getToken" onclick="getToken();">Get Token</button>
 </div>
 <div>
-	<textarea id="token">token</textarea>
+	<textarea id="token" style="display:none;">token</textarea>
 </div>
 <form id="projectForm" method="post">
 	<div>
@@ -43,10 +43,13 @@
 	<button id="createProject" onclick="createProject();">Create Project</button>
 </div>
 <div>
-	<textarea id="projectID">projectID</textarea>
+	<textarea id="projectID" style="display:none;">projectID</textarea>
 </div>
 <div>
 	<button id="capture" onclick="capture();">Capture</button>
+</div>
+<div>
+	<button id="predict" onclick="predict();">Predict</button>
 </div>
 	
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -61,6 +64,18 @@ var token = document.querySelector("#token");
 var projectForm = document.querySelector("#projectForm");
 var createProjectButton = document.querySelector("#createProject");
 var projectID = document.querySelector("#projectID");
+
+function getToken() {
+	var formData = new FormData(tokenForm);
+	axios.get("https://app.deepblock.net/api/token",
+		{ headers: {"Authorization": formData.get("email")} }
+	)
+	.then(function (response) {
+		token.value = response.data.token;
+	})
+	.catch(function (error) {
+	});
+}
 
 function createProject() {
 	var formData = new FormData(projectForm);
@@ -90,18 +105,6 @@ function createProject() {
 	});
 }
 
-function getToken() {
-	var formData = new FormData(tokenForm);
-	axios.get("https://app.deepblock.net/api/token",
-		{ headers: {"Authorization": formData.get("email")} }
-	)
-	.then(function (response) {
-		token.value = response.data.token;
-	})
-	.catch(function (error) {
-	});
-}
-
 function capture() {
 	canvas.width = video.videoWidth;
 	canvas.height = video.videoHeight;
@@ -117,15 +120,74 @@ function capture() {
 	var formData = new FormData();
   	formData.append('projectID', projectID.value);
 	formData.append('files', file);
- 	axios.post("https://app.deepblock.net/storage_api/file_system/"
-		+ "face_detection/projects/"
+ 	axios.post("https://app.deepblock.net/storage_api/file_system"
+		+ "/face_detection/projects/"
 		+ projectID.value
 		+ "/predict-files",
 		formData,
  	  	{ headers: {"Authorization": token.value} },
  	)
 	.then(function (response) {
-		console.log(response);
+	})
+	.catch(function (error) {
+	});
+}
+
+function predict() {
+	var formData = new FormData(projectForm);
+	const projectName = formData.get("projectName");
+	const modelType = "FaceDetection";
+	axios.post("https://app.deepblock.net/master_api/project_api/predict",
+		{"projectID": projectID.value, "projectName": projectName, "modelType": modelType, "gpus": 1},
+ 	  	{ headers: {"Authorization": token.value, "Content-Type": "application/json"} },
+ 	)
+	.then(function (response) {
+		var status = 0;
+		var start = false;
+		var intervalID = setInterval(check, 1000);
+		function check() {
+			axios.get("https://app.deepblock.net/master_api/project_api/"
+				+ projectID.value
+				+ "/status",
+		 	  	{ headers: {"Authorization": token.value} },
+		 	)
+			.then(function (response) {
+				status = response.data.status;
+				if (!start && status === 3) {
+					start = true;
+				}
+				else if (start && status === 0) {
+					clearInterval(intervalID)
+					axios.get("https://app.deepblock.net/storage_api/file_system"
+						+ "/projects/"
+						+ projectID.value
+						+ "/runtypes/predict/logs",
+				 	  	{ headers: {"Authorization": token.value} }
+				 	)
+					.then(function (response) {
+						var outputs = response.data.split('\n');
+						for (output of outputs) {
+							var obj = JSON.parse(output);
+							var context = canvas.getContext('2d');
+							var box = obj.box;
+							const top = box[0];
+							const right = box[1];
+							const bottom = box[2];
+							const left = box[3];
+							const width = right-left;
+							const height = bottom-top;
+							context.lineWidth = 5;
+							context.strokeStyle = '#ff0000';
+							context.strokeRect(left, top, width, height);
+						}
+					})
+					.catch(function (error) {
+					});
+				}
+			})
+			.catch(function (error) {
+			});
+		};
 	})
 	.catch(function (error) {
 	});
@@ -136,8 +198,7 @@ if (navigator.mediaDevices.getUserMedia) {
     .then(function (stream) {
       video.srcObject = stream;
     })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
+    .catch(function (error) {
     });
 }
 </script>
